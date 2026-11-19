@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ODDLY — Precision AI Film Production</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -105,7 +106,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Scroll Progress Hairline */
     #scrollProgress {
       position: fixed;
       top: 0;
@@ -118,9 +118,6 @@
       transition: width 0.08s linear;
     }
 
-    /* ============================================================
-       SILKY PHOSPHORESCENT GREEN (#C7FF3D) LIQUID WAVE HOVER
-       ============================================================ */
     .wave-btn {
       position: relative;
       overflow: hidden;
@@ -158,7 +155,6 @@
       transform: translateY(-1px);
     }
 
-    /* Surface Wave Glow for Work Cards & Process Cards */
     .wave-surface {
       position: relative;
       overflow: hidden;
@@ -200,7 +196,6 @@
       z-index: 1;
     }
 
-    /* Nav link wave pill (sweeps left-to-right smoothly) */
     .nav-wave {
       position: relative;
       overflow: hidden;
@@ -229,7 +224,6 @@
       color: #0A0A0A;
     }
 
-    /* Stacked Interactive Tiers */
     .tier-bar {
       position: relative;
       overflow: hidden;
@@ -285,7 +279,6 @@
       border-color: #0A0A0A;
     }
 
-    /* Obsidian Luminous Sign-In Card (exact visual homage to reference #1) */
     .obsidian-card {
       position: relative;
       background: radial-gradient(circle at 22% 0%, rgba(199, 255, 61, 0.18) 0%, rgba(20, 22, 23, 0.94) 36%, #0D0D0F 100%);
@@ -306,7 +299,6 @@
       filter: blur(0.4px);
     }
 
-    /* ODDLY right-shift "Second Take" hover motion */
     .oddly-shift-hover {
       transition: transform 0.48s var(--ease-silk);
     }
@@ -314,7 +306,6 @@
       transform: translateX(7px);
     }
 
-    /* Scroll Reveal */
     .reveal {
       opacity: 0;
       transform: translateY(22px);
@@ -325,7 +316,6 @@
       transform: translateY(0);
     }
 
-    /* Ken Burns preview in lightbox */
     .ken-burns-playing {
       animation: kbMotion 14s ease-in-out infinite alternate;
     }
@@ -338,7 +328,6 @@
       100% { transform: scale(1.04) translate3d(1.8%, 1%, 0); }
     }
 
-    /* Modal Transitions */
     .modal-backdrop {
       opacity: 0;
       pointer-events: none;
@@ -365,12 +354,9 @@
 <body class="selection:bg-[#C7FF3D] selection:text-[#0A0A0A]">
   <div id="scrollProgress"></div>
 
-  <!-- ============================================================
-       MINIMAL STICKY HEADER
-       ============================================================ -->
+  <!-- MINIMAL STICKY HEADER -->
   <header class="fixed top-0 inset-x-0 z-50 bg-[#0A0A0A]/82 backdrop-blur-xl border-b border-[#F4F1E8]/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
-      <!-- Official ODDLY Geometric Logo -->
       <a href="#hero" class="flex items-center gap-3 shrink-0 group py-2" aria-label="ODDLY Home">
         <svg class="h-6 sm:h-7 w-auto" viewBox="0 0 360 88" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="42" cy="44" r="30" stroke="#F4F1E8" stroke-width="18"/>
@@ -382,7 +368,6 @@
         </svg>
       </a>
 
-      <!-- Minimal Navigation -->
       <nav class="hidden md:flex items-center gap-1 bg-[#121213] border border-[#F4F1E8]/10 rounded-full p-1.5">
         <a href="#work" class="nav-wave px-4 py-1.5 rounded-full text-xs font-semibold text-[#F4F1E8]/80">Work</a>
         <a href="#divisions" class="nav-wave px-4 py-1.5 rounded-full text-xs font-semibold text-[#F4F1E8]/80">Divisions</a>
@@ -390,28 +375,24 @@
         <a href="#signin" class="nav-wave px-4 py-1.5 rounded-full text-xs font-semibold text-[#F4F1E8]/80">Client Access</a>
       </nav>
 
-      <!-- Header Actions -->
       <div class="flex items-center gap-2.5">
-        <a href="https://www.instagram.com/oddly1studio/" target="_blank" rel="noopener noreferrer" aria-label="ODDLY Instagram" class="wave-btn w-9 h-9 rounded-full bg-[#141415] border border-[#F4F1E8]/15 text-[#F4F1E8] flex items-center justify-center">
+        <a id="headerIgLink" href="https://www.instagram.com/oddly1studio/" target="_blank" rel="noopener noreferrer" aria-label="ODDLY Instagram" class="wave-btn w-9 h-9 rounded-full bg-[#141415] border border-[#F4F1E8]/15 text-[#F4F1E8] flex items-center justify-center">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
             <rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/>
             <circle cx="12" cy="12" r="4.2"/>
             <circle cx="17.6" cy="6.4" r="1" fill="currentColor" stroke="none"/>
           </svg>
         </a>
-        <a href="#signin" class="wave-btn px-5 py-2 rounded-full bg-[#F4F1E8] text-[#0A0A0A] border border-[#F4F1E8] text-xs font-bold">
+        <button id="headerAdminBtn" type="button" class="hidden wave-btn px-4 py-2 rounded-full bg-[#C7FF3D] text-[#0A0A0A] border border-[#C7FF3D] text-xs font-extrabold">Analytics</button>
+        <a id="headerAuthBtn" href="#signin" class="wave-btn px-5 py-2 rounded-full bg-[#F4F1E8] text-[#0A0A0A] border border-[#F4F1E8] text-xs font-bold">
           Sign In
         </a>
       </div>
     </div>
   </header>
 
-  <!-- ============================================================
-       SECTION 1: HERO (Continuous Animated Wave Rings + Clean English)
-       Rule 05: Text sits cleanly on Void #0A0A0A; wave canvas flows on right flank.
-       ============================================================ -->
+  <!-- SECTION 1: HERO -->
   <section id="hero" class="relative min-h-[92vh] pt-28 pb-16 sm:pt-36 sm:pb-24 flex items-center overflow-hidden">
-    <!-- Continuous Animated Moiré Wave Canvas on the Right Flank -->
     <div class="pointer-events-none select-none absolute inset-y-0 right-0 w-full lg:w-[54%] overflow-hidden" aria-hidden="true">
       <canvas id="waveCanvas" class="w-full h-full block"></canvas>
       <div class="absolute inset-0 bg-gradient-to-r from-[#0A0A0A] via-[#0A0A0A]/55 to-transparent"></div>
@@ -444,7 +425,6 @@
           </button>
         </div>
 
-        <!-- Credible Executive Pillars (No Turnaround Times) -->
         <div class="grid grid-cols-3 gap-4 sm:gap-6 pt-5 max-w-lg border-t border-[#F4F1E8]/10">
           <div>
             <div class="text-xl sm:text-2xl font-extrabold text-[#F4F1E8]">4K</div>
@@ -463,9 +443,7 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       SECTION 2: SELECTED WORK (Clean 16:9 Grid Only — Client Facing)
-       ============================================================ -->
+  <!-- SECTION 2: SELECTED WORK -->
   <section id="work" class="py-16 sm:py-24 border-t border-[#F4F1E8]/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col gap-10">
       <div class="reveal flex flex-wrap items-end justify-between gap-4">
@@ -474,7 +452,6 @@
           <h2 class="text-3xl sm:text-4xl font-extrabold text-[#F4F1E8]">Selected Work</h2>
         </div>
 
-        <!-- Division Filter Pills -->
         <div id="divisionFilters" class="flex flex-wrap items-center gap-2">
           <button data-div="all" type="button" class="div-filter wave-btn px-4 py-2 rounded-full bg-[#C7FF3D] text-[#0A0A0A] border border-[#C7FF3D] text-xs font-bold">All</button>
           <button data-div="FILMS" type="button" class="div-filter wave-btn px-4 py-2 rounded-full bg-[#141415] text-[#F4F1E8] border border-[#F4F1E8]/15 text-xs font-semibold">ODDLY FILMS</button>
@@ -483,14 +460,11 @@
         </div>
       </div>
 
-      <!-- Clean Client-Facing 16:9 Cinema Grid -->
       <div id="portfolioGrid" class="reveal grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
   </section>
 
-  <!-- ============================================================
-       SECTION 3: DIVISIONS (Stacked Interactive Bars)
-       ============================================================ -->
+  <!-- SECTION 3: DIVISIONS -->
   <section id="divisions" class="py-16 sm:py-24 border-t border-[#F4F1E8]/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
       <div class="lg:col-span-5 reveal flex flex-col gap-4">
@@ -554,9 +528,7 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       SECTION 4: APPROACH (Tight, Credible 3-Step Pipeline)
-       ============================================================ -->
+  <!-- SECTION 4: APPROACH -->
   <section id="process" class="py-16 sm:py-24 border-t border-[#F4F1E8]/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col gap-10">
       <div class="reveal flex flex-col gap-2 max-w-xl">
@@ -584,45 +556,39 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       SECTION 5: CLIENT SIGN-IN CARD (Exact Match to Reference #1)
-       Email + Google (Gmail) Sign-In ONLY + Instagram Link
-       ============================================================ -->
+  <!-- SECTION 5: REAL SUPABASE SIGN-IN CARD + INSTAGRAM -->
   <section id="signin" class="py-20 sm:py-28 border-t border-[#F4F1E8]/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center">
       <div class="reveal obsidian-card rounded-[32px] w-full max-w-[440px] p-7 sm:p-10 flex flex-col gap-6">
         <div class="text-center flex flex-col items-center gap-1.5">
-          <!-- DD Double-Take Mark -->
           <svg class="h-7 w-auto mb-2" viewBox="0 0 116 68" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M48 11H72C86.9117 11 99 23.0883 99 38C99 52.9117 86.9117 65 72 65H48" stroke="#F4F1E8" stroke-width="15"/>
             <path d="M18 11H42C56.9117 11 69 23.0883 69 38C69 52.9117 56.9117 65 42 65H18" stroke="#0D0D0F" stroke-width="21"/>
             <path d="M16 11H40C54.9117 11 67 23.0883 67 38C67 52.9117 54.9117 65 40 65H16" stroke="#C7FF3D" stroke-width="15"/>
           </svg>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-[#F4F1E8] tracking-tight">Welcome back</h2>
-          <p class="text-xs sm:text-sm text-[#F4F1E8]/55">Sign in to your ODDLY account</p>
+          <p class="text-xs sm:text-sm text-[#F4F1E8]/55">Sign in with Email or Google</p>
         </div>
 
-        <!-- Email Input with Integrated Luminous Circular Arrow Button -->
         <form id="emailLoginForm" class="flex flex-col gap-3">
           <div class="relative flex items-center bg-white/[0.04] hover:bg-white/[0.06] focus-within:bg-white/[0.08] border border-[#F4F1E8]/12 focus-within:border-[#C7FF3D] rounded-2xl pl-4 pr-2 py-2 transition-colors">
             <div class="flex-1 flex flex-col">
               <label for="loginEmail" class="text-[10px] font-medium text-[#F4F1E8]/45 leading-none mb-1">Email</label>
               <input id="loginEmail" required type="email" placeholder="name@company.com" class="w-full bg-transparent text-sm text-[#F4F1E8] placeholder-[#F4F1E8]/35 outline-none" />
             </div>
-            <button type="submit" aria-label="Sign in with email" class="w-10 h-10 rounded-full bg-[#C7FF3D] hover:scale-105 active:scale-95 text-[#0A0A0A] flex items-center justify-center shrink-0 shadow-[0_0_24px_rgba(199,255,61,0.45)] transition-transform">
+            <button id="emailSubmitBtn" type="submit" aria-label="Sign in with email" class="w-10 h-10 rounded-full bg-[#C7FF3D] hover:scale-105 active:scale-95 text-[#0A0A0A] flex items-center justify-center shrink-0 shadow-[0_0_24px_rgba(199,255,61,0.45)] transition-transform">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6"/></svg>
             </button>
           </div>
+          <p id="authFeedback" class="hidden text-[11px] text-center text-[#C7FF3D] leading-relaxed"></p>
         </form>
 
-        <!-- OR Divider -->
         <div class="flex items-center gap-3">
           <div class="h-px flex-1 bg-[#F4F1E8]/10"></div>
           <span class="text-[11px] font-medium text-[#F4F1E8]/40 uppercase tracking-widest">OR</span>
           <div class="h-px flex-1 bg-[#F4F1E8]/10"></div>
         </div>
 
-        <!-- Continue with Google (Gmail) -->
         <button id="googleLoginBtn" type="button" class="wave-btn w-full py-3.5 px-4 rounded-2xl bg-white/[0.04] border border-[#F4F1E8]/12 text-sm font-semibold text-[#F4F1E8] flex items-center justify-between group">
           <span class="flex items-center gap-3">
             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
@@ -638,16 +604,14 @@
           </span>
         </button>
 
-        <!-- Signed-in Status Banner (Hidden until user signs in) -->
         <div id="signedInBanner" class="hidden rounded-2xl bg-[#C7FF3D]/12 border border-[#C7FF3D]/40 px-4 py-3 text-xs text-[#F4F1E8] flex items-center justify-between gap-2">
           <span id="signedInText" class="truncate"></span>
           <button id="signOutBtn" type="button" class="text-[#C7FF3D] font-bold hover:underline shrink-0">Sign out</button>
         </div>
 
-        <!-- Direct Social Links (Instagram) -->
         <div class="pt-2 border-t border-[#F4F1E8]/10 flex flex-col gap-2.5">
           <div class="text-[11px] text-center text-[#F4F1E8]/45 uppercase tracking-widest">Connect with ODDLY</div>
-          <a href="https://www.instagram.com/oddly1studio/" target="_blank" rel="noopener noreferrer" class="wave-btn w-full py-3 px-4 rounded-2xl bg-white/[0.03] border border-[#F4F1E8]/12 text-xs font-semibold text-[#F4F1E8]/90 flex items-center justify-between">
+          <a id="cardIgLink" href="https://www.instagram.com/oddly1studio/" target="_blank" rel="noopener noreferrer" class="wave-btn w-full py-3 px-4 rounded-2xl bg-white/[0.03] border border-[#F4F1E8]/12 text-xs font-semibold text-[#F4F1E8]/90 flex items-center justify-between">
             <span class="flex items-center gap-2.5">
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/>
@@ -663,24 +627,22 @@
     </div>
   </section>
 
-  <!-- Minimal Footer -->
+  <!-- Minimal Footer (Triple-click ODDLY or open #admin for Private Analytics) -->
   <footer class="border-t border-[#F4F1E8]/10 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-4 text-xs text-[#F4F1E8]/50">
       <div class="flex items-center gap-3">
-        <span class="font-extrabold text-[#F4F1E8] tracking-wider">ODDLY</span>
+        <span id="secretAdminTrigger" class="font-extrabold text-[#F4F1E8] tracking-wider select-none cursor-default">ODDLY</span>
         <span>·</span>
         <span>Built oddly. Directed precisely.</span>
       </div>
       <div class="flex items-center gap-5">
-        <a href="https://www.instagram.com/oddly1studio/" target="_blank" rel="noopener noreferrer" class="hover:text-[#C7FF3D] transition-colors font-semibold">Instagram</a>
+        <a id="footerIgLink" href="https://www.instagram.com/oddly1studio/" target="_blank" rel="noopener noreferrer" class="hover:text-[#C7FF3D] transition-colors font-semibold">Instagram</a>
         <span>© 2026 ODDLY Studio</span>
       </div>
     </div>
   </footer>
 
-  <!-- ============================================================
-       CINEMA VIDEO PLAYER MODAL (With 55% DD Watermark)
-       ============================================================ -->
+  <!-- CINEMA VIDEO PLAYER MODAL -->
   <div id="playerModal" class="modal-backdrop fixed inset-0 z-[60] bg-[#0A0A0A]/88 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-6">
     <div class="modal-content w-full max-w-4xl bg-[#111112] border border-[#F4F1E8]/15 rounded-[28px] p-4 sm:p-6 flex flex-col gap-4 max-h-[92vh] overflow-y-auto shadow-2xl">
       <div class="flex items-center justify-between gap-3">
@@ -699,7 +661,6 @@
           <img id="pSimImg" src="" alt="" class="w-full h-full object-cover ken-burns-playing" />
           <div class="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-transparent to-transparent pointer-events-none"></div>
 
-          <!-- Official 55% DD Watermark -->
           <svg class="absolute top-4 right-4 h-6 w-auto opacity-55 pointer-events-none" viewBox="0 0 116 68" fill="none">
             <path d="M48 11H72C86.9117 11 99 23.0883 99 38C99 52.9117 86.9117 65 72 65H48" stroke="#F4F1E8" stroke-width="15"/>
             <path d="M16 11H40C54.9117 11 67 23.0883 67 38C67 52.9117 54.9117 65 40 65H16" stroke="#F4F1E8" stroke-width="15"/>
@@ -729,11 +690,121 @@
     </div>
   </div>
 
+  <!-- PRIVATE OWNER ANALYTICS MODAL (Hidden from clients; open via #admin or triple-click ODDLY in footer) -->
+  <div id="adminModal" class="modal-backdrop fixed inset-0 z-[70] bg-[#0A0A0A]/92 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-6">
+    <div class="modal-content obsidian-card w-full max-w-4xl rounded-[28px] p-5 sm:p-7 flex flex-col gap-5 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#C7FF3D] shadow-[0_0_12px_#C7FF3D]"></span>
+          <h3 class="text-lg sm:text-xl font-extrabold text-[#F4F1E8]">ODDLY Private Analytics</h3>
+        </div>
+        <button id="closeAdminBtn" type="button" aria-label="Close" class="wave-btn w-9 h-9 rounded-full bg-[#19191B] border border-[#F4F1E8]/15 text-[#F4F1E8] flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Lock Screen -->
+      <form id="adminLockForm" class="flex flex-col gap-3 max-w-sm mx-auto w-full py-6">
+        <p class="text-xs text-[#F4F1E8]/60 text-center">Enter your private owner PIN to unlock live visitor analytics.</p>
+        <input id="adminPinInput" required type="password" placeholder="Owner PIN" class="bg-white/[0.05] border border-[#F4F1E8]/15 focus:border-[#C7FF3D] rounded-2xl px-4 py-3 text-sm text-[#F4F1E8] text-center tracking-widest outline-none" />
+        <button type="submit" class="wave-btn py-3 rounded-2xl bg-[#C7FF3D] text-[#0A0A0A] border border-[#C7FF3D] font-bold text-sm">Unlock Dashboard</button>
+        <p id="adminPinErr" class="hidden text-xs text-rose-400 text-center">Incorrect PIN</p>
+      </form>
+
+      <!-- Unlocked Live Analytics Dashboard -->
+      <div id="adminDashboardBody" class="hidden flex-col gap-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <span id="adminStatusNote" class="text-xs text-[#F4F1E8]/60">Connected to Supabase live tracking.</span>
+          <button id="refreshAdminBtn" type="button" class="wave-btn px-4 py-1.5 rounded-full bg-[#161618] border border-[#F4F1E8]/15 text-xs font-bold text-[#F4F1E8]">Refresh Live Data</button>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="rounded-2xl bg-white/[0.04] border border-[#F4F1E8]/10 p-4">
+            <div class="text-[11px] text-[#F4F1E8]/55">Total Visits</div>
+            <div id="kpiVisits" class="text-2xl font-extrabold text-[#C7FF3D] mt-1">0</div>
+          </div>
+          <div class="rounded-2xl bg-white/[0.04] border border-[#F4F1E8]/10 p-4">
+            <div class="text-[11px] text-[#F4F1E8]/55">Video Plays</div>
+            <div id="kpiPlays" class="text-2xl font-extrabold text-[#F4F1E8] mt-1">0</div>
+          </div>
+          <div class="rounded-2xl bg-white/[0.04] border border-[#F4F1E8]/10 p-4">
+            <div class="text-[11px] text-[#F4F1E8]/55">Signed-In Clients</div>
+            <div id="kpiUsers" class="text-2xl font-extrabold text-[#F4F1E8] mt-1">0</div>
+          </div>
+          <div class="rounded-2xl bg-white/[0.04] border border-[#F4F1E8]/10 p-4">
+            <div class="text-[11px] text-[#F4F1E8]/55">Instagram Clicks</div>
+            <div id="kpiIg" class="text-2xl font-extrabold text-[#F4F1E8] mt-1">0</div>
+          </div>
+        </div>
+
+        <!-- Top Videos Breakdown -->
+        <div class="rounded-2xl bg-white/[0.03] border border-[#F4F1E8]/10 p-4 flex flex-col gap-3">
+          <div class="text-xs font-bold uppercase tracking-wider text-[#C7FF3D]">Most Watched Videos</div>
+          <div id="adminTopVideos" class="flex flex-col gap-2 text-xs"></div>
+        </div>
+
+        <!-- Recent Activity Feed -->
+        <div class="rounded-2xl bg-white/[0.03] border border-[#F4F1E8]/10 p-4 flex flex-col gap-3">
+          <div class="text-xs font-bold uppercase tracking-wider text-[#C7FF3D]">Recent Visitor Activity</div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-[#F4F1E8]/10 text-[#F4F1E8]/50">
+                  <th class="py-2 pr-3 font-semibold">Time</th>
+                  <th class="py-2 pr-3 font-semibold">Action</th>
+                  <th class="py-2 pr-3 font-semibold">Detail</th>
+                  <th class="py-2 pr-3 font-semibold">User</th>
+                  <th class="py-2 font-semibold">Device</th>
+                </tr>
+              </thead>
+              <tbody id="adminEventsTable" class="divide-y divide-[#F4F1E8]/5 text-[#F4F1E8]/85"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[75] px-5 py-2.5 rounded-full bg-[#C7FF3D] text-[#0A0A0A] font-bold text-xs shadow-[0_12px_36px_rgba(199,255,61,0.35)] opacity-0 pointer-events-none translate-y-3 transition-all duration-300"></div>
 
   <script>
     (function () {
+      /* ============================================================
+         0. SUPABASE CLIENT & LIVE ANALYTICS TRACKING
+         ============================================================ */
+      const SUPABASE_URL = 'https://mypwirvcjlbpehwjqhel.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_qlPHWT8rarvD1AqX2rAF7A_0NZCJqDY';
+      const OWNER_PIN = 'oddly2026';
+      const ADMIN_EMAIL = 'yt4943293@gmail.com';
+
+      let sb = null;
+      try {
+        if (window.supabase && window.supabase.createClient) {
+          sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+      } catch (e) {}
+
+      let currentUserEmail = '';
+      let adminUnlocked = false;
+
+      function getDeviceLabel() {
+        return /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
+      }
+
+      async function trackEvent(eventType, label) {
+        if (!sb) return;
+        try {
+          await sb.from('site_events').insert([{
+            event_type: eventType,
+            label: label || '',
+            user_email: currentUserEmail || 'Guest',
+            device: getDeviceLabel()
+          }]);
+        } catch (e) {}
+      }
+
       /* ============================================================
          1. CONTINUOUS ANIMATED MOIRÉ WAVE RINGS CANVAS (60fps)
          ============================================================ */
@@ -777,7 +848,7 @@
 
         const cx1 = w * 0.76;
         const cy1 = h * 0.50;
-        const cx2 = cx1 + 28; // Official ODDLY right-shift ("Second Take")
+        const cx2 = cx1 + 28;
         const cy2 = cy1;
 
         waveTime += 0.012;
@@ -791,12 +862,9 @@
           const amp = 4.5 + (i / ringCount) * 8;
           const phase = waveTime * 1.35 - i * 0.24;
 
-          // Subtle bone concentric undulating wave
           drawWaveRing(cx1, cy1, baseR, amp, 5, phase, '#F4F1E8', 1.15, 0.11);
-          // Secondary right-shifted Moiré wave
           drawWaveRing(cx2, cy2, baseR + 6, amp * 0.85, 4, -phase * 0.8, '#F4F1E8', 0.9, 0.06);
 
-          // Single travelling Signal Green (#C7FF3D) highlight wave
           const dist = Math.abs(i - signalPos);
           if (dist < 1.2) {
             const glowAlpha = (1 - dist / 1.2) * 0.92;
@@ -900,14 +968,8 @@
         filter: 'all',
         playerId: null,
         playing: true,
-        progress: 14,
-        userEmail: ''
+        progress: 14
       };
-
-      try {
-        const storedUser = localStorage.getItem('oddly_client_user');
-        if (storedUser) state.userEmail = storedUser;
-      } catch (e) {}
 
       function escapeHtml(str) {
         return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -919,10 +981,9 @@
         toastEl.textContent = msg;
         toastEl.classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
         if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toastEl.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none'), 2800);
+        toastTimer = setTimeout(() => toastEl.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none'), 3200);
       }
 
-      // Mouse-tracking wave origin for all .wave-btn & .wave-surface
       document.addEventListener('pointermove', (e) => {
         const el = e.target.closest('.wave-btn, .wave-surface');
         if (!el) return;
@@ -970,9 +1031,9 @@
             : 'div-filter wave-btn px-4 py-2 rounded-full bg-[#141415] text-[#F4F1E8] border border-[#F4F1E8]/15 text-xs font-semibold';
         });
         renderGrid();
+        trackEvent('division_filter', state.filter);
       });
 
-      // Stacked Tier Bar Interaction
       const tierBars = document.querySelectorAll('.tier-bar');
       function selectTier(idx) {
         tierBars.forEach((bar, i) => bar.classList.toggle('is-active', i === idx));
@@ -982,7 +1043,10 @@
       }
       tierBars.forEach((bar, idx) => {
         bar.addEventListener('mouseenter', () => selectTier(idx));
-        bar.addEventListener('click', () => selectTier(idx));
+        bar.addEventListener('click', () => {
+          selectTier(idx);
+          trackEvent('division_click', tierDetails[idx]?.tag || '');
+        });
       });
 
       // Cinema Video Player Modal
@@ -1009,6 +1073,8 @@
         img.classList.remove('ken-burns-paused');
         startSim(v.duration);
         document.getElementById('playerModal').classList.add('open');
+
+        trackEvent('video_play', v.title);
       }
 
       function startSim(dur) {
@@ -1058,42 +1124,256 @@
         updateTime(v ? v.duration : '00:45');
       });
 
-      // Sign-In Logic (Email + Google Gmail)
-      function renderAuthState() {
+      // Track Instagram Clicks
+      ['headerIgLink', 'cardIgLink', 'footerIgLink'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', () => trackEvent('instagram_click', '@oddly1studio'));
+      });
+
+      /* ============================================================
+         3. REAL SUPABASE AUTHENTICATION (Email Magic Link + Google)
+         ============================================================ */
+      function renderAuthState(email) {
+        currentUserEmail = email || '';
         const banner = document.getElementById('signedInBanner');
         const txt = document.getElementById('signedInText');
-        if (state.userEmail) {
-          txt.textContent = 'Signed in as ' + state.userEmail;
+        const headerBtn = document.getElementById('headerAuthBtn');
+        const headerAdminBtn = document.getElementById('headerAdminBtn');
+        const isAdmin = currentUserEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+        if (currentUserEmail) {
+          txt.textContent = 'Signed in as ' + currentUserEmail;
           banner.classList.remove('hidden');
+          headerBtn.textContent = 'Account';
         } else {
           banner.classList.add('hidden');
+          headerBtn.textContent = 'Sign In';
+        }
+        if (headerAdminBtn) {
+          headerAdminBtn.classList.toggle('hidden', !isAdmin);
+        }
+        if (isAdmin) {
+          adminUnlocked = true;
         }
       }
 
-      document.getElementById('emailLoginForm').addEventListener('submit', (e) => {
+      if (sb) {
+        sb.auth.getSession().then(({ data }) => {
+          if (data && data.session && data.session.user) {
+            renderAuthState(data.session.user.email);
+          }
+        }).catch(() => {});
+
+        sb.auth.onAuthStateChange((event, session) => {
+          if (session && session.user) {
+            renderAuthState(session.user.email);
+            if (event === 'SIGNED_IN') {
+              trackEvent('user_signin', session.user.email);
+              showToast('Welcome, ' + session.user.email);
+            }
+          } else if (event === 'SIGNED_OUT') {
+            renderAuthState('');
+          }
+        });
+      }
+
+      document.getElementById('emailLoginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value.trim();
+        const feedback = document.getElementById('authFeedback');
         if (!email) return;
-        state.userEmail = email;
-        try { localStorage.setItem('oddly_client_user', email); } catch (err) {}
-        renderAuthState();
-        e.target.reset();
-        showToast('Sign-in link sent to ' + email);
+
+        if (!sb) {
+          showToast('Connection unavailable');
+          return;
+        }
+
+        feedback.classList.remove('hidden');
+        feedback.textContent = 'Sending sign-in link...';
+        try {
+          const { error } = await sb.auth.signInWithOtp({
+            email,
+            options: { emailRedirectTo: window.location.origin }
+          });
+          if (error) {
+            feedback.textContent = error.message;
+            showToast('Could not send link');
+          } else {
+            feedback.textContent = 'Check your inbox — we sent a one-click sign-in link to ' + email;
+            showToast('Sign-in link sent to ' + email);
+            trackEvent('signin_requested', email);
+            e.target.reset();
+          }
+        } catch (err) {
+          feedback.textContent = 'Unable to connect right now.';
+        }
       });
 
-      document.getElementById('googleLoginBtn').addEventListener('click', () => {
-        state.userEmail = 'Google Account (Gmail)';
-        try { localStorage.setItem('oddly_client_user', state.userEmail); } catch (err) {}
-        renderAuthState();
-        showToast('Signed in with Google');
+      document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+        if (!sb) return;
+        try {
+          const { error } = await sb.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: window.location.origin }
+          });
+          if (error) {
+            showToast('Enable Google provider in Supabase Auth, or sign in via Email above');
+          }
+        } catch (err) {
+          showToast('Sign in with Email above');
+        }
       });
 
-      document.getElementById('signOutBtn').addEventListener('click', () => {
-        state.userEmail = '';
-        try { localStorage.removeItem('oddly_client_user'); } catch (err) {}
-        renderAuthState();
+      document.getElementById('signOutBtn').addEventListener('click', async () => {
+        if (sb) {
+          try { await sb.auth.signOut(); } catch (e) {}
+        }
+        renderAuthState('');
         showToast('Signed out');
       });
+
+      /* ============================================================
+         4. PRIVATE OWNER ANALYTICS DASHBOARD (#admin or 3x click ODDLY)
+         ============================================================ */
+      const adminModal = document.getElementById('adminModal');
+      const adminLockForm = document.getElementById('adminLockForm');
+      const adminDashboardBody = document.getElementById('adminDashboardBody');
+
+      function openAdminModal() {
+        adminModal.classList.add('open');
+        if (adminUnlocked) {
+          adminLockForm.classList.add('hidden');
+          adminDashboardBody.classList.remove('hidden');
+          adminDashboardBody.classList.add('flex');
+          loadAdminData();
+        }
+      }
+
+      function closeAdminModal() {
+        adminModal.classList.remove('open');
+        if (window.location.hash === '#admin') {
+          history.replaceState(null, '', window.location.pathname);
+        }
+      }
+
+      let footerClicks = 0;
+      let footerClickTimer = null;
+      document.getElementById('secretAdminTrigger').addEventListener('click', () => {
+        footerClicks += 1;
+        if (footerClickTimer) clearTimeout(footerClickTimer);
+        if (footerClicks >= 3) {
+          footerClicks = 0;
+          openAdminModal();
+        } else {
+          footerClickTimer = setTimeout(() => { footerClicks = 0; }, 700);
+        }
+      });
+
+      window.addEventListener('hashchange', () => {
+        if (window.location.hash === '#admin') openAdminModal();
+      });
+      if (window.location.hash === '#admin') openAdminModal();
+
+      document.getElementById('headerAdminBtn').addEventListener('click', openAdminModal);
+      document.getElementById('closeAdminBtn').addEventListener('click', closeAdminModal);
+      adminModal.addEventListener('click', (e) => { if (e.target.id === 'adminModal') closeAdminModal(); });
+
+      adminLockForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const pin = document.getElementById('adminPinInput').value.trim();
+        const err = document.getElementById('adminPinErr');
+        if (pin === OWNER_PIN) {
+          adminUnlocked = true;
+          err.classList.add('hidden');
+          adminLockForm.classList.add('hidden');
+          adminDashboardBody.classList.remove('hidden');
+          adminDashboardBody.classList.add('flex');
+          loadAdminData();
+        } else {
+          err.classList.remove('hidden');
+        }
+      });
+
+      async function loadAdminData() {
+        const statusEl = document.getElementById('adminStatusNote');
+        if (!sb) {
+          statusEl.textContent = 'Supabase client not loaded.';
+          return;
+        }
+        statusEl.textContent = 'Loading live events from Supabase...';
+        try {
+          const { data, error } = await sb
+            .from('site_events')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(200);
+
+          if (error) {
+            statusEl.textContent = 'Run the SQL setup query in Supabase SQL Editor to create the site_events table.';
+            return;
+          }
+
+          const rows = data || [];
+          statusEl.textContent = 'Live · Showing latest ' + rows.length + ' recorded events';
+
+          const visits = rows.filter(r => r.event_type === 'page_view').length;
+          const plays = rows.filter(r => r.event_type === 'video_play');
+          const igClicks = rows.filter(r => r.event_type === 'instagram_click').length;
+          const uniqueEmails = new Set(
+            rows
+              .map(r => r.user_email)
+              .filter(e => e && e !== 'Guest')
+          );
+
+          document.getElementById('kpiVisits').textContent = String(visits);
+          document.getElementById('kpiPlays').textContent = String(plays.length);
+          document.getElementById('kpiUsers').textContent = String(uniqueEmails.size);
+          document.getElementById('kpiIg').textContent = String(igClicks);
+
+          // Top Videos
+          const vidCounts = {};
+          plays.forEach(p => {
+            const k = p.label || 'Unknown';
+            vidCounts[k] = (vidCounts[k] || 0) + 1;
+          });
+          const sortedVids = Object.entries(vidCounts).sort((a, b) => b[1] - a[1]);
+          const topEl = document.getElementById('adminTopVideos');
+          if (sortedVids.length === 0) {
+            topEl.innerHTML = '<div class="text-[#F4F1E8]/45">No video plays recorded yet.</div>';
+          } else {
+            const maxC = sortedVids[0][1] || 1;
+            topEl.innerHTML = sortedVids.map(([name, count]) => `
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center justify-between text-[#F4F1E8]">
+                  <span class="truncate">${escapeHtml(name)}</span>
+                  <span class="font-bold text-[#C7FF3D]">${count}</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div class="h-full bg-[#C7FF3D] rounded-full" style="width:${Math.round((count / maxC) * 100)}%"></div>
+                </div>
+              </div>
+            `).join('');
+          }
+
+          // Activity Table
+          const tbody = document.getElementById('adminEventsTable');
+          tbody.innerHTML = rows.slice(0, 40).map(r => {
+            const dt = r.created_at ? new Date(r.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+            return `
+              <tr>
+                <td class="py-2 pr-3 text-[#F4F1E8]/55 whitespace-nowrap">${escapeHtml(dt)}</td>
+                <td class="py-2 pr-3 font-bold text-[#C7FF3D] whitespace-nowrap">${escapeHtml(r.event_type)}</td>
+                <td class="py-2 pr-3">${escapeHtml(r.label || '—')}</td>
+                <td class="py-2 pr-3 text-[#F4F1E8]/75">${escapeHtml(r.user_email || 'Guest')}</td>
+                <td class="py-2 text-[#F4F1E8]/55">${escapeHtml(r.device || '—')}</td>
+              </tr>
+            `;
+          }).join('') || '<tr><td colspan="5" class="py-4 text-center text-[#F4F1E8]/45">No activity yet.</td></tr>';
+        } catch (err) {
+          statusEl.textContent = 'Could not load events.';
+        }
+      }
+
+      document.getElementById('refreshAdminBtn').addEventListener('click', loadAdminData);
 
       // Scroll Progress + Scroll Reveal
       const progressBar = document.getElementById('scrollProgress');
@@ -1118,10 +1398,13 @@
         revealEls.forEach(el => el.classList.add('visible'));
       }
 
-      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { closePlayer(); closeAdminModal(); }
+      });
 
       renderGrid();
-      renderAuthState();
+      // Record initial page visit
+      trackEvent('page_view', window.location.pathname || '/');
     })();
   </script>
 </body>
