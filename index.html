@@ -629,7 +629,10 @@
       <div id="adminDashboardBody" class="hidden flex-col gap-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <span id="adminStatusNote" class="text-xs text-[#F4F1E8]/60">Connected to Supabase live tracking.</span>
-          <button id="refreshAdminBtn" type="button" class="wave-btn px-4 py-1.5 rounded-full bg-[#161618] border border-[#F4F1E8]/15 text-xs font-bold text-[#F4F1E8]">Refresh Live Data</button>
+          <div class="flex items-center gap-2">
+            <button id="toggleSelfIgnoreBtn" type="button" class="wave-btn px-3.5 py-1.5 rounded-full bg-[#161618] border border-[#F4F1E8]/15 text-xs font-semibold text-[#F4F1E8]/80">Ignore My Device: OFF</button>
+            <button id="refreshAdminBtn" type="button" class="wave-btn px-4 py-1.5 rounded-full bg-[#161618] border border-[#F4F1E8]/15 text-xs font-bold text-[#F4F1E8]">Refresh Live Data</button>
+          </div>
         </div>
 
         <!-- Tracked Client Link Generator -->
@@ -679,7 +682,7 @@
   <script>
     (function () {
       /* ============================================================
-         0. SUPABASE + PERSISTENT PER-DEVICE VISITOR TRACKING
+         0. SUPABASE + BOT-PROOF HUMAN TRACKING (TIME + SCROLL + MODEL + GEO)
          ============================================================ */
       const SUPABASE_URL = 'https://mypwirvcjlbpehwjqhel.supabase.co';
       const SUPABASE_KEY = 'sb_publishable_qlPHWT8rarvD1AqX2rAF7A_0NZCJqDY';
@@ -692,10 +695,25 @@
         }
       } catch (e) {}
 
-      // Persistent Visitor ID per device + ?client=CompanyName capture
+      // Strict Bot / Link-Preview Filter
+      function isLikelyBot() {
+        const ua = navigator.userAgent || '';
+        if (navigator.webdriver) return true;
+        if (/bot|crawl|spider|slurp|headless|puppeteer|playwright|lighthouse|whatsapp|facebookexternalhit|facebot|telegrambot|twitterbot|linkedinbot|slackbot|discordbot|vercel|preview|prerender|curl|wget|python/i.test(ua)) return true;
+        const w = window.screen ? window.screen.width : 0;
+        const h = window.screen ? window.screen.height : 0;
+        if (w < 200 || h < 200) return true;
+        let tz = '';
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+        if (w === 800 && h === 600 && (tz === 'UTC' || tz === 'Etc/UTC' || !tz)) return true;
+        return false;
+      }
+
+      let ignoreSelf = false;
       let visitorId = 'VIS-' + Math.random().toString(36).slice(2, 6).toUpperCase();
       let clientLabel = '';
       try {
+        ignoreSelf = localStorage.getItem('oddly_ignore_self') === '1';
         const storedId = localStorage.getItem('oddly_visitor_id');
         if (storedId) visitorId = storedId;
         else localStorage.setItem('oddly_visitor_id', visitorId);
@@ -710,14 +728,27 @@
         }
       } catch (e) {}
 
-      function getRichDeviceInfo() {
+      function formatModelBrand(rawModel) {
+        if (!rawModel) return '';
+        const m = rawModel.trim();
+        if (/^SM-/i.test(m)) return 'Samsung ' + m;
+        if (/^(2[1-5]\d|M2\d|Redmi|POCO)/i.test(m)) return 'Xiaomi ' + m;
+        if (/^CPH/i.test(m)) return 'OPPO ' + m;
+        if (/^RMX/i.test(m)) return 'Realme ' + m;
+        if (/^V2\d/i.test(m)) return 'Vivo ' + m;
+        if (/^Pixel/i.test(m)) return 'Google ' + m;
+        return m;
+      }
+
+      function getBaseDeviceInfo() {
         const ua = navigator.userAgent || '';
         let os = 'Desktop';
         if (/iPhone/i.test(ua)) os = 'iPhone (iOS)';
         else if (/iPad/i.test(ua)) os = 'iPad (iOS)';
         else if (/Android/i.test(ua)) {
           const m = ua.match(/Android[^;]*;\s*([^)]+)\)/);
-          os = m && m[1] ? 'Android · ' + m[1].split('Build')[0].trim() : 'Android';
+          const rawM = m && m[1] ? m[1].split('Build')[0].trim() : '';
+          os = (rawM && rawM !== 'K') ? ('Android · ' + formatModelBrand(rawM)) : 'Android Phone';
         } else if (/Mac OS X/i.test(ua)) os = 'Mac';
         else if (/Windows/i.test(ua)) os = 'Windows PC';
 
@@ -729,8 +760,9 @@
 
         let tz = '';
         try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+        const lang = navigator.language || '';
         const scr = window.screen ? (window.screen.width + 'x' + window.screen.height) : '';
-        return [os, browser, scr, tz].filter(Boolean).join(' · ');
+        return { os, browser, scr, tz, lang };
       }
 
       function getReferrerLabel() {
@@ -741,19 +773,121 @@
         } catch (e) { return 'Direct'; }
       }
 
-      const deviceSummary = getRichDeviceInfo();
+      const baseInfo = getBaseDeviceInfo();
+      let enrichedModel = baseInfo.os;
+      let geoLabel = baseInfo.tz || '';
       const visitorKey = clientLabel ? (clientLabel + ' [' + visitorId + ']') : visitorId;
 
+      function buildDeviceString() {
+        return [enrichedModel, baseInfo.browser, baseInfo.scr, geoLabel, baseInfo.lang, 'via ' + getReferrerLabel()]
+          .filter(Boolean).join(' · ');
+      }
+
+      // Enrich phone model via Client Hints (modern Android Chrome) + City/Country via public HTTPS Geo API
+      async function enrichVisitorContext() {
+        try {
+          if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+            const hints = await navigator.userAgentData.getHighEntropyValues(['model', 'platform', 'platformVersion']);
+            if (hints && hints.model) {
+              enrichedModel = (hints.platform || 'Android') + ' · ' + formatModelBrand(hints.model);
+            }
+          }
+        } catch (e) {}
+        try {
+          const res = await fetch('https://ipapi.co/json/');
+          if (res.ok) {
+            const g = await res.json();
+            if (g && (g.city || g.country_name)) {
+              geoLabel = [g.city, g.country_code || g.country_name].filter(Boolean).join(', ');
+            }
+          }
+        } catch (e) {}
+      }
+
+      let humanVerified = false;
+      let sessionStartMs = Date.now();
+      let maxScrollPct = 0;
+      let lastSentDurationSec = 0;
+
+      function canTrack() {
+        return Boolean(sb) && !isLikelyBot() && !ignoreSelf && window.location.hash !== '#admin';
+      }
+
       async function trackEvent(eventType, label) {
-        if (!sb) return;
+        if (!canTrack()) return;
         try {
           await sb.from('site_events').insert([{
             event_type: eventType,
             label: label || '',
             user_email: visitorKey,
-            device: deviceSummary + ' · via ' + getReferrerLabel()
+            device: buildDeviceString()
           }]);
         } catch (e) {}
+      }
+
+      // Keepalive beacon for exact Time on Site + Max Scroll when visitor leaves
+      function sendSessionDuration(isFinal) {
+        if (!canTrack() || !humanVerified) return;
+        const sec = Math.max(1, Math.round((Date.now() - sessionStartMs) / 1000));
+        if (!isFinal && sec - lastSentDurationSec < 15) return;
+        if (isFinal && sec <= lastSentDurationSec) return;
+        lastSentDurationSec = sec;
+        const payload = JSON.stringify([{
+          event_type: 'time_spent',
+          label: sec + 's · Scroll ' + maxScrollPct + '%',
+          user_email: visitorKey,
+          device: buildDeviceString()
+        }]);
+        try {
+          fetch(SUPABASE_URL + '/rest/v1/site_events', {
+            method: 'POST',
+            keepalive: true,
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_KEY,
+              'Authorization': 'Bearer ' + SUPABASE_KEY,
+              'Prefer': 'return=minimal'
+            },
+            body: payload
+          });
+        } catch (e) {}
+      }
+
+      // Human Verification Gate: only logs page_view after real human interaction or 2.5s visible stay
+      function initHumanGate() {
+        if (isLikelyBot() || ignoreSelf || window.location.hash === '#admin') return;
+        let fired = false;
+        const confirmHuman = async () => {
+          if (fired || document.visibilityState !== 'visible') return;
+          fired = true;
+          humanVerified = true;
+          sessionStartMs = Date.now();
+          await enrichVisitorContext();
+          initHumanGate();
+        };
+        ['pointerdown', 'scroll', 'keydown', 'touchstart'].forEach(evt => {
+          window.addEventListener(evt, confirmHuman, { once: true, passive: true });
+        });
+        setTimeout(() => {
+          if (document.visibilityState === 'visible') confirmHuman();
+        }, 2500);
+
+        window.addEventListener('scroll', () => {
+          const docH = document.documentElement.scrollHeight - window.innerHeight;
+          if (docH > 0) {
+            const pct = Math.min(100, Math.round((window.scrollY / docH) * 100));
+            if (pct > maxScrollPct) maxScrollPct = pct;
+          }
+        }, { passive: true });
+
+        setInterval(() => {
+          if (document.visibilityState === 'visible') sendSessionDuration(false);
+        }, 20000);
+
+        window.addEventListener('pagehide', () => sendSessionDuration(true));
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden') sendSessionDuration(true);
+        });
       }
 
       /* ============================================================
@@ -1212,15 +1346,22 @@
           const plays = rows.filter(r => r.event_type === 'video_play').length;
           const steps = rows.filter(r => r.event_type === 'brief_open' || r.event_type === 'spaces_open').length;
 
-          // Group events by Device/Visitor key
+          // Group events by Device/Visitor key (and filter out old 800x600 UTC bot rows from display)
+          const cleanRows = rows.filter(r => !(r.device && /800x600.*UTC/i.test(r.device)));
           const groups = {};
-          rows.forEach(r => {
+          cleanRows.forEach(r => {
             const key = r.user_email || 'Unknown Device';
             if (!groups[key]) {
-              groups[key] = { key, device: r.device || '—', visits: 0, events: [], lastSeen: r.created_at, firstSeen: r.created_at };
+              groups[key] = { key, device: r.device || '—', visits: 0, maxSec: 0, maxScroll: 0, events: [], lastSeen: r.created_at, firstSeen: r.created_at };
             }
             const g = groups[key];
             if (r.event_type === 'page_view') g.visits += 1;
+            if (r.event_type === 'time_spent' && r.label) {
+              const sm = r.label.match(/(\d+)s/);
+              const scm = r.label.match(/Scroll\s+(\d+)%/);
+              if (sm) g.maxSec = Math.max(g.maxSec, Number(sm[1]));
+              if (scm) g.maxScroll = Math.max(g.maxScroll, Number(scm[1]));
+            }
             g.events.push(r);
             if (r.created_at > g.lastSeen) g.lastSeen = r.created_at;
             if (r.created_at < g.firstSeen) g.firstSeen = r.created_at;
@@ -1256,6 +1397,7 @@
                       <div class="text-sm font-extrabold text-[#F4F1E8] flex items-center gap-2">
                         <span>${escapeHtml(d.key)}</span>
                         <span class="px-2 py-0.5 rounded-full bg-[#C7FF3D]/15 text-[#C7FF3D] text-[10px]">${d.visits || 1} visit(s)</span>
+                        ${d.maxSec ? `<span class="px-2 py-0.5 rounded-full bg-white/10 text-[#F4F1E8] text-[10px]">${d.maxSec}s · ${d.maxScroll}% scroll</span>` : ''}
                       </div>
                       <div class="text-[11px] text-[#F4F1E8]/55 truncate">${escapeHtml(d.device)}</div>
                     </div>
@@ -1274,6 +1416,18 @@
         }
       }
 
+      const selfBtn = document.getElementById('toggleSelfIgnoreBtn');
+      function updateSelfBtn() {
+        selfBtn.textContent = ignoreSelf ? 'Ignore My Device: ON' : 'Ignore My Device: OFF';
+        selfBtn.classList.toggle('border-[#C7FF3D]', ignoreSelf);
+      }
+      updateSelfBtn();
+      selfBtn.addEventListener('click', () => {
+        ignoreSelf = !ignoreSelf;
+        try { localStorage.setItem('oddly_ignore_self', ignoreSelf ? '1' : '0'); } catch (e) {}
+        updateSelfBtn();
+        showToast(ignoreSelf ? 'Your device will no longer be tracked' : 'Tracking re-enabled on this device');
+      });
       document.getElementById('refreshAdminBtn').addEventListener('click', loadAdminData);
 
       // Scroll Progress + Scroll Reveal
