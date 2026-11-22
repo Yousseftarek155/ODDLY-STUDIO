@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ODDLY — Precision AI Film Production</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
   <script>
@@ -11,7 +14,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['GCEpicPro', 'Inter', 'system-ui', 'sans-serif'],
+            sans: ['Montserrat', 'Inter', 'system-ui', 'sans-serif'],
             display: ['GCEpicPro', 'Inter', 'system-ui', 'sans-serif'],
           },
           colors: {
@@ -77,7 +80,18 @@
       scroll-behavior: smooth;
       background-color: var(--void);
       color: var(--bone);
-      font-family: 'GCEpicPro', system-ui, -apple-system, sans-serif;
+      font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    }
+
+    
+    /* Typography Hierarchy: GCEpicPro for Display/Headings, Montserrat for Body Copy */
+    h1, h2, h3, h4, h5, .font-display, nav a, button, .wave-btn, .tier-text, .tier-num {
+      font-family: 'GCEpicPro', system-ui, sans-serif;
+    }
+    p, .tier-sub, .reel-note, input, .body-copy {
+      font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.01em;
     }
 
     body {
@@ -390,7 +404,7 @@
 
         <div id="activeTierDetail" class="mt-1 rounded-2xl bg-[#121213] border border-[#F4F1E8]/10 p-5 flex flex-col gap-2">
           <div id="tierDetailTag" class="text-xs font-bold tracking-wider uppercase text-[#C7FF3D]">ODDLY FILMS</div>
-          <div id="tierDetailText" class="text-sm text-[#F4F1E8]/82 leading-relaxed">Commercial campaigns, product launches, and brand films engineered for high-impact distribution.</div>
+          <div id="tierDetailText" class="body-copy text-sm text-[#F4F1E8]/82 leading-relaxed">Commercial campaigns, product launches, and brand films engineered for high-impact distribution.</div>
         </div>
       </div>
 
@@ -475,7 +489,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center">
       <div class="reveal obsidian-card rounded-[32px] w-full max-w-[460px] p-7 sm:p-10 flex flex-col gap-6">
         <div class="text-center flex flex-col items-center gap-2">
-          <svg class="h-7 w-auto mb-1" viewBox="0 0 116 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg id="secretAdminTrigger" class="h-7 w-auto mb-1 cursor-default" viewBox="0 0 116 68" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M48 11H72C86.9117 11 99 23.0883 99 38C99 52.9117 86.9117 65 72 65H48" stroke="#F4F1E8" stroke-width="15"/>
             <path d="M18 11H42C56.9117 11 69 23.0883 69 38C69 52.9117 56.9117 65 42 65H18" stroke="#0D0D0F" stroke-width="21"/>
             <path d="M16 11H40C54.9117 11 67 23.0883 67 38C67 52.9117 54.9117 65 40 65H16" stroke="#C7FF3D" stroke-width="15"/>
@@ -512,21 +526,7 @@
     </div>
   </section>
 
-  <!-- Minimal Footer -->
-  <footer class="border-t border-[#F4F1E8]/10 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-4 text-xs text-[#F4F1E8]/50">
-      <div class="flex items-center gap-3">
-        <span id="secretAdminTrigger" class="font-extrabold text-[#F4F1E8] tracking-wider select-none cursor-default">ODDLY</span>
-        <span>·</span>
-        <span>Built oddly. Directed precisely.</span>
-      </div>
-      <div class="flex items-center gap-5">
-        <a id="footerWaLink" href="https://wa.me/201515437858" target="_blank" rel="noopener noreferrer" class="hover:text-[#C7FF3D] transition-colors font-semibold">WhatsApp</a>
-        <a id="footerGmailLink" href="mailto:yt4943296@gmail.com" class="hover:text-[#C7FF3D] transition-colors font-semibold">Gmail</a>
-        <span>© 2026 ODDLY Studio</span>
-      </div>
-    </div>
-  </footer>
+
 
   <!-- ============================================================
        CASE STUDY MODAL: VIDEO + 2 ACTION ICONS (BRIEF + FREEPIK SPACES)
@@ -651,7 +651,7 @@
         <div class="min-w-0">
           <div id="lbTag" class="text-[10px] font-bold uppercase tracking-wider text-[#C7FF3D]"></div>
           <div id="lbTitle" class="text-sm font-bold text-[#F4F1E8] truncate"></div>
-          <div id="lbNote" class="text-xs text-[#F4F1E8]/60 truncate"></div>
+          <div id="lbNote" class="body-copy text-xs text-[#F4F1E8]/70 truncate"></div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <button id="lbPrevBtn" type="button" class="wave-btn w-9 h-9 rounded-full bg-[#1B1B1D] border border-[#F4F1E8]/15 text-xs font-bold text-[#F4F1E8] flex items-center justify-center">←</button>
@@ -1148,7 +1148,7 @@
           aspect: '16:9',
           clientType: 'ODDLY Flagship Film · GCC B2B',
           thumb: 'assets/oddly/02.jpg',
-          videoSrc: 'Oddly Addir Ad07 16X9 4K Handbrake V08.mp4',
+          videoSrc: 'videos/Oddly Addir Ad07 16X9 4K Handbrake V08.mp4',
           desc: 'Abu Fahad only wanted a simple coffee ad on a sunny beach. Unguided AI threw him through 7 chaotic eras — until one press of ODDLY delivered his exact brief.',
           brief: [
             { step: '01 · Client & Context', title: 'Solving Gulf B2B Skepticism', body: 'CMOs and founders across the GCC have tested generic AI tools and been burned by off-brand hallucinations. ODDLY needed a flagship film separating directed cinema from prompt roulette.' },
@@ -1363,7 +1363,7 @@
             <div class="p-3.5 flex flex-col gap-1">
               <span class="text-[10px] font-bold uppercase tracking-wider text-[#C7FF3D]">${escapeHtml(sp.tag)}</span>
               <div class="text-xs font-bold text-[#F4F1E8] truncate">${escapeHtml(sp.title)}</div>
-              <div class="text-[11px] text-[#F4F1E8]/55 leading-snug line-clamp-2">${escapeHtml(sp.note)}</div>
+              <div class="reel-note text-xs text-[#F4F1E8]/68 leading-relaxed line-clamp-2">${escapeHtml(sp.note)}</div>
             </div>
           </div>
         `).join('');
